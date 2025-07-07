@@ -1,9 +1,20 @@
+import React, { useEffect, useState } from 'react';
 import VideoBanner from '../components/VideoBanner';
 import VideoCard from '../components/VideoCard';
 import clips from '../data/clips';
 import ProductGrid from '../components/ProductGrid';
+import customFetch from '../axios/custom';
 
 export default function Home() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    // Fetch products from backend API
+    customFetch.get('/products')
+      .then(res => setProducts(res.data))
+      .catch(err => console.error("Failed to fetch products", err));
+  }, []);
+
   return (
     <div className="space-y-24">
       {/* 1. Hero Video */}
@@ -24,10 +35,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Your existing Product Grid */}
+      {/* 3. Product Grid (NOW PASSED!) */}
       <section className="py-16 px-5 bg-gray-50">
         <h2 className="text-4xl text-center mb-8">Our Collection</h2>
-        <ProductGrid /* pass your products in as before */ />
+        <ProductGrid products={products} />
       </section>
 
       {/* 4. Testimonials */}

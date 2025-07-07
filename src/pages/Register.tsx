@@ -12,26 +12,29 @@ const Register = () => {
     // Get form data
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
+
     // Check if form data is valid
     if (!checkRegisterFormData(data)) return;
 
-    // Check if user with this email already exists
-    const users = await customFetch.get("/users");
-    const userExists = users.data.some(
-      (user: { email: string }) => user.email === data.email
-    );
-    if (userExists) {
-      toast.error("User with this email already exists");
-      return;
-    }
+    // Combine name + lastname for username
+    const username = `${data.name} ${data.lastname}`.trim();
 
-    // Register user
-    const response = await customFetch.post("/users", data);
-    if (response.status === 201) {
+    try {
+      // Send registration request to backend
+      const response = await customFetch.post("/auth/register", {
+        username,
+        email: data.email,
+        password: data.password,
+      });
+
       toast.success("User registered successfully");
       navigate("/login");
-    } else {
-      toast.error("An error occurred. Please try again");
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An error occurred. Please try again");
+      }
     }
   };
 
@@ -108,4 +111,5 @@ const Register = () => {
     </div>
   );
 };
+
 export default Register;

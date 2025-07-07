@@ -1,3 +1,7 @@
+// src/pages/SingleProduct.tsx
+
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   Button,
   Dropdown,
@@ -5,8 +9,7 @@ import {
   QuantityInput,
   StandardSelectInput,
 } from "../components";
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import customFetch from "../axios/custom";
 import { addProductToTheCart } from "../features/cart/cartSlice";
 import { useAppDispatch } from "../hooks";
 import WithSelectInputWrapper from "../utils/withSelectInputWrapper";
@@ -14,77 +17,96 @@ import WithNumberInputWrapper from "../utils/withNumberInputWrapper";
 import { formatCategoryName } from "../utils/formatCategoryName";
 import toast from "react-hot-toast";
 
-const SingleProduct = () => {
+interface Product {
+  _id: string;
+  name: string;
+  image: string;
+  category: string;
+  price: number;
+  popularity?: number;
+  stock?: number;
+}
+
+const SingleProduct: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [singleProduct, setSingleProduct] = useState<Product | null>(null);
-  // defining default values for input fields
   const [size, setSize] = useState<string>("xs");
   const [color, setColor] = useState<string>("black");
   const [quantity, setQuantity] = useState<number>(1);
-  const params = useParams<{ id: string }>();
+
+  const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
 
-  // defining HOC instances
   const SelectInputUpgrade = WithSelectInputWrapper(StandardSelectInput);
   const QuantityInputUpgrade = WithNumberInputWrapper(QuantityInput);
 
   useEffect(() => {
-    const fetchSingleProduct = async () => {
-      const response = await fetch(
-        `http://localhost:3000/products/${params.id}`
-      );
-      const data = await response.json();
-      setSingleProduct(data);
+    if (!id) return;
+
+    const fetchSingle = async () => {
+      try {
+        const res = await customFetch.get<Product>(`/products/${id}`);
+        setSingleProduct(res.data);
+      } catch {
+        toast.error("Product not found");
+        setSingleProduct(null);
+      }
     };
 
-    const fetchProducts = async () => {
-      const response = await fetch("http://localhost:3000/products");
-      const data = await response.json();
-      setProducts(data);
+    const fetchAll = async () => {
+      try {
+        const res = await customFetch.get<Product[]>("/products");
+        setProducts(res.data);
+      } catch {
+        toast.error("Could not load products");
+      }
     };
-    fetchSingleProduct();
-    fetchProducts();
-  }, [params.id]);
+
+    fetchSingle();
+    fetchAll();
+  }, [id]);
 
   const handleAddToCart = () => {
-    if (singleProduct) {
-      dispatch(
-        addProductToTheCart({
-          id: singleProduct.id + size + color,
-          image: singleProduct.image,
-          title: singleProduct.title,
-          category: singleProduct.category,
-          price: singleProduct.price,
-          quantity,
-          size,
-          color,
-          popularity: singleProduct.popularity,
-          stock: singleProduct.stock,
-        })
-      );
-      toast.success("Product added to the cart");
-    }
+    if (!singleProduct) return;
+    dispatch(
+      addProductToTheCart({
+        id: `${singleProduct._id}-${size}-${color}`,
+        image: singleProduct.image,
+        title: singleProduct.name,
+        category: singleProduct.category,
+        price: singleProduct.price,
+        quantity,
+        size,
+        color,
+        popularity: singleProduct.popularity ?? 0,
+        stock: singleProduct.stock ?? 0,
+      })
+    );
+    toast.success("Product added to the cart");
   };
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-5 max-[400px]:px-3">
+    <div className="max-w-screen-2xl mx-auto px-5 pt-24">
+      {/* DETAIL SECTION */}
       <div className="grid grid-cols-3 gap-x-8 max-lg:grid-cols-1">
         <div className="lg:col-span-2">
-          <img
-            src={`/src/assets/${singleProduct?.image}`}
-            alt={singleProduct?.title}
-          />
+          {singleProduct && (
+            <img
+              src={singleProduct.image}
+              alt={singleProduct.name}
+              className="w-full object-cover"
+            />
+          )}
         </div>
         <div className="w-full flex flex-col gap-5 mt-9">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-4xl">{singleProduct?.title}</h1>
-            <div className="flex justify-between items-center">
-              <p className="text-base text-secondaryBrown">
-                {formatCategoryName(singleProduct?.category || "")}
-              </p>
-              <p className="text-base font-bold">${ singleProduct?.price }</p>
-            </div>
+          <h1 className="text-4xl">{singleProduct?.name}</h1>
+          <div className="flex justify-between items-center">
+            <p className="text-base text-secondaryBrown">
+              {formatCategoryName(singleProduct?.category || "")}
+            </p>
+            <p className="text-base font-bold">${singleProduct?.price}</p>
           </div>
+
           <div className="flex flex-col gap-2">
             <SelectInputUpgrade
               selectList={[
@@ -96,9 +118,7 @@ const SingleProduct = () => {
                 { id: "2xl", value: "2XL" },
               ]}
               value={size}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setSize(() => e.target.value)
-              }
+              onChange={(e) => setSize(e.target.value)}
             />
             <SelectInputUpgrade
               selectList={[
@@ -110,66 +130,50 @@ const SingleProduct = () => {
                 { id: "green", value: "GREEN" },
               ]}
               value={color}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setColor(() => e.target.value)
-              }
+              onChange={(e) => setColor(e.target.value)}
             />
-
             <QuantityInputUpgrade
               value={quantity}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setQuantity(() => parseInt(e.target.value))
-              }
+              onChange={(e) => setQuantity(parseInt(e.target.value))}
             />
           </div>
+
           <div className="flex flex-col gap-3">
             <Button mode="brown" text="Add to cart" onClick={handleAddToCart} />
             <p className="text-secondaryBrown text-sm text-right">
               Delivery estimated on the Friday, July 26
             </p>
           </div>
-          <div>
-            {/* drowdown items */}
-            <Dropdown dropdownTitle="Description">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Labore
-              quos deleniti, mollitia, vitae harum suscipit voluptatem quasi, ab
-              assumenda accusantium rem praesentium accusamus quae quam tempore
-              nostrum corporis eaque. Mollitia.
-            </Dropdown>
 
-            <Dropdown dropdownTitle="Product Details">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fuga ad
-              at odio illo, necessitatibus, reprehenderit dolore voluptas ea
-              consequuntur ducimus repellat soluta mollitia facere sapiente.
-              Unde provident possimus hic dolore.
-            </Dropdown>
-
-            <Dropdown dropdownTitle="Delivery Details">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fuga ad
-              at odio illo, necessitatibus, reprehenderit dolore voluptas ea
-              consequuntur ducimus repellat soluta mollitia facere sapiente.
-              Unde provident possimus hic dolore.
-            </Dropdown>
-          </div>
+          <Dropdown dropdownTitle="Description">
+            {singleProduct?.name} — {singleProduct?.category}
+          </Dropdown>
+          <Dropdown dropdownTitle="Product Details">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore quos
+            deleniti mollitia…
+          </Dropdown>
+          <Dropdown dropdownTitle="Delivery Details">
+            Shipping & returns within 30 days.
+          </Dropdown>
         </div>
       </div>
 
-      {/* similar products */}
-      <div>
-        <h2 className="text-black/90 text-5xl mt-24 mb-12 text-center max-lg:text-4xl">
+      {/* SIMILAR PRODUCTS */}
+      <div className="mt-24">
+        <h2 className="text-5xl text-center mb-12 max-lg:text-4xl">
           Similar Products
         </h2>
-        <div className="flex flex-wrap justify-between items-center gap-y-8 mt-12 max-xl:justify-start max-xl:gap-5 ">
-          {products.slice(0, 3).map((product: Product) => (
+        <div className="flex flex-wrap justify-between gap-y-8 mt-12">
+          {products.slice(0, 3).map((p) => (
             <ProductItem
-              key={product?.id}
-              id={product?.id}
-              image={product?.image}
-              title={product?.title}
-              category={product?.category}
-              price={product?.price}
-              popularity={product?.popularity}
-              stock={product?.stock}
+              key={p._id}
+              id={p._id}
+              image={p.image}
+              title={p.name}
+              category={p.category}
+              price={p.price}
+              popularity={p.popularity}
+              stock={p.stock}
             />
           ))}
         </div>
@@ -177,4 +181,5 @@ const SingleProduct = () => {
     </div>
   );
 };
+
 export default SingleProduct;

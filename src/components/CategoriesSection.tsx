@@ -1,9 +1,10 @@
+// CategoriesSection.jsx
 import CategoryItem from "./CategoryItem";
 
 const CategoriesSection = () => {
   return (
-    <div className="max-w-screen-2xl px-5 mx-auto mt-24">
-      <h2 className="text-black text-5xl font-normal tracking-[1.56px] max-sm:text-4xl mb-12">
+    <div className="max-w-screen-2xl px-5 mx-auto mt-10">
+      <h2 className="text-black text-2xl font-semibold tracking-tight mb-4">
         Our Categories
       </h2>
       <div className="flex justify-between flex-wrap gap-y-10">

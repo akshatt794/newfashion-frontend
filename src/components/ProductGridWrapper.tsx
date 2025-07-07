@@ -27,8 +27,6 @@ const ProductGridWrapper = ({
   const { totalProducts } = useAppSelector((state) => state.shop);
   const dispatch = useAppDispatch();
 
-  // Memoize the function to prevent unnecessary re-renders
-  // getSearchedProducts will be called only when searchQuery or sortCriteria changes
   const getSearchedProducts = useCallback(
     async (query: string, sort: string, page: number) => {
       if (!query || query.length === 0) {
@@ -36,13 +34,19 @@ const ProductGridWrapper = ({
       }
       const response = await customFetch("/products");
       const allProducts = await response.data;
+
+      // Use "name" instead of "title"
       let searchedProducts = allProducts.filter((product: Product) =>
-        product.title.toLowerCase().includes(query.toLowerCase())
+        product.name && product.name.toLowerCase().includes(query.toLowerCase())
       );
 
+      // --- FIXED: Case-insensitive category filtering ---
       if (category) {
         searchedProducts = searchedProducts.filter((product: Product) => {
-          return product.category === category;
+          return (
+            product.category &&
+            product.category.toUpperCase() === category.toUpperCase()
+          );
         });
       }
 
@@ -59,53 +63,40 @@ const ProductGridWrapper = ({
         searchedProducts = searchedProducts.sort(
           (a: Product, b: Product) => b.price - a.price
         );
-      } else if (sort === "popularity") {
+      } else if (sort === "popularity" && allProducts[0]?.popularity) {
         searchedProducts = searchedProducts.sort(
           (a: Product, b: Product) => b.popularity - a.popularity
         );
       }
+
       // Limit the number of products to be displayed
       if (limit) {
         setProducts(searchedProducts.slice(0, limit));
-        // Set the number of products being displayed
-        // This will be displayed in the ShowingPagination component
         dispatch(setShowingProducts(searchedProducts.slice(0, limit).length));
-        // If page is provided, slice the products based on the page number
-        // this will be used for pagination
       } else if (page) {
         setProducts(searchedProducts.slice(0, page * 9));
-        // Set the number of products being displayed
-        // This will be displayed in the ShowingPagination component
-        dispatch(
-          setShowingProducts(searchedProducts.slice(0, page * 9).length)
-        );
-        // If no limit or page is provided, display all the products
+        dispatch(setShowingProducts(searchedProducts.slice(0, page * 9).length));
       } else {
         setProducts(searchedProducts);
-        // Set the number of products being displayed
         dispatch(setShowingProducts(searchedProducts.length));
       }
     },
-    []
+    [category, limit, page, sortCriteria, totalProducts, dispatch]
   );
 
   useEffect(() => {
     getSearchedProducts(searchQuery || "", sortCriteria || "", page || 1);
-  }, [searchQuery, sortCriteria, page]);
+    // eslint-disable-next-line
+  }, [searchQuery, sortCriteria, page, category, limit]);
 
-  // Clone the children and pass the products as props to the children
-  // This will cause the children to re-render with the new products
-  // Also it will cause many re-renders if the children are not memoized
-  // So I memoized the ProductGrid component
   const childrenWithProps = React.Children.map(children, (child) => {
-    // Checking isValidElement is the safe way and avoids a
-    // typescript error too.
     if (React.isValidElement(child) && products.length > 0) {
       return React.cloneElement(child, { products: products });
     }
     return null;
   });
 
-  return childrenWithProps;
+  return <>{childrenWithProps}</>;
 };
+
 export default ProductGridWrapper;

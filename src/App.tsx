@@ -1,20 +1,22 @@
+// src/App.tsx
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import {
   Cart,
   Checkout,
   HomeLayout,
-  Landing,
+  Landing,    // make sure you import Landing here
   Login,
-  OrderConfirmation,
-  OrderHistory,
   Register,
   Search,
   Shop,
-  SingleOrderHistory,
   SingleProduct,
+  OrderConfirmation,
+  OrderHistory,
+  SingleOrderHistory,
   UserProfile,
+  AdminPanel,
 } from "./pages";
-import { checkoutAction, searchAction } from "./actions/index";
+import { checkoutAction, searchAction } from "./actions";
 import { shopCategoryLoader } from "./pages/Shop";
 import { loader as orderHistoryLoader } from "./pages/OrderHistory";
 import { loader as singleOrderLoader } from "./pages/SingleOrderHistory";
@@ -26,7 +28,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Landing />,
+        element: <Landing />,   // <Landing /> is your home/landing
       },
       {
         path: "shop",
@@ -52,8 +54,8 @@ const router = createBrowserRouter([
       },
       {
         path: "search",
-        action: searchAction,
         element: <Search />,
+        action: searchAction,
       },
       {
         path: "login",
@@ -68,10 +70,6 @@ const router = createBrowserRouter([
         element: <OrderConfirmation />,
       },
       {
-        path: "user-profile",
-        element: <UserProfile />,
-      },
-      {
         path: "order-history",
         element: <OrderHistory />,
         loader: orderHistoryLoader,
@@ -79,14 +77,21 @@ const router = createBrowserRouter([
       {
         path: "order-history/:id",
         element: <SingleOrderHistory />,
-        loader: singleOrderLoader
+        loader: singleOrderLoader,
       },
+      {
+        path: "user-profile",
+        element: <UserProfile />,
+      },
+      {
+        path: "admin",
+        element: <AdminPanel />,
+      },
+      
     ],
   },
 ]);
 
-function App() {
+export default function App() {
   return <RouterProvider router={router} />;
 }
-
-export default App;

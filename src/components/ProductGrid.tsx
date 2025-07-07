@@ -11,8 +11,8 @@ const ProductGrid = ({ products }: { products?: Product[] }) => {
       {products &&
         products.map((product: Product) => (
           <ProductItem
-            key={nanoid()}
-            id={product.id}
+            key={product._id || nanoid()}    // Use MongoDB _id for key if present
+            id={product._id}                 // Use _id here!
             image={product.image}
             title={product.title}
             category={product.category}
@@ -24,5 +24,5 @@ const ProductGrid = ({ products }: { products?: Product[] }) => {
     </div>
   );
 };
-// Memoize the component to prevent unnecessary re-renders because of React.cloneElement
+
 export default React.memo(ProductGrid);

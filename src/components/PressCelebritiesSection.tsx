@@ -1,5 +1,4 @@
 // src/components/PressCelebritiesSection.tsx
-import React from "react";
 
 const celebs = [
   { name: "Alia Bhatt", img: "/images/celeb1.jpg" },

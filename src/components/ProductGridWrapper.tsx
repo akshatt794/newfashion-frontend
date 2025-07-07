@@ -35,9 +35,9 @@ const ProductGridWrapper = ({
       const response = await customFetch("/products");
       const allProducts = await response.data;
 
-      // Use "name" instead of "title"
+      // FIXED: Use "title" for search, not "name"
       let searchedProducts = allProducts.filter((product: Product) =>
-        product.name && product.name.toLowerCase().includes(query.toLowerCase())
+        product.title && product.title.toLowerCase().includes(query.toLowerCase())
       );
 
       // --- FIXED: Case-insensitive category filtering ---

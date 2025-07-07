@@ -1,6 +1,9 @@
 import React from "react";
+
 import ProductItem from "./ProductItem";
 import { nanoid } from "nanoid";
+import { Product } from "../types/Product"; // Adjust the path if your file structure is different
+
 
 const ProductGrid = ({ products }: { products?: Product[] }) => {
   return (
@@ -11,15 +14,14 @@ const ProductGrid = ({ products }: { products?: Product[] }) => {
       {products &&
         products.map((product: Product) => (
           <ProductItem
-            key={product._id || nanoid()}    // Use MongoDB _id for key if present
-            id={product._id}                 // Use _id here!
-            image={product.image}
-            title={product.title}
-            category={product.category}
-            price={product.price}
-            popularity={product.popularity}
-            stock={product.stock}
-          />
+  key={product._id || nanoid()}
+  id={product._id}
+  image={product.image}
+  title={product.name}            // <--- Fix: use product.name!
+  category={product.category}
+  price={product.price}
+/>
+
         ))}
     </div>
   );

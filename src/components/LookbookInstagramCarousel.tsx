@@ -1,5 +1,4 @@
 // src/components/LookbookInstagramCarousel.tsx
-import React from "react";
 
 const posts = [
   "/images/insta1.jpg",

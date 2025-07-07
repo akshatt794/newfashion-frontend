@@ -23,8 +23,7 @@ interface Product {
   image: string;
   category: string;
   price: number;
-  popularity?: number;
-  stock?: number;
+  
 }
 
 const SingleProduct: React.FC = () => {
@@ -78,8 +77,8 @@ const SingleProduct: React.FC = () => {
         quantity,
         size,
         color,
-        popularity: singleProduct.popularity ?? 0,
-        stock: singleProduct.stock ?? 0,
+        stock: 1,           // add dummy value
+  popularity: 0  
       })
     );
     toast.success("Product added to the cart");
@@ -172,8 +171,7 @@ const SingleProduct: React.FC = () => {
               title={p.name}
               category={p.category}
               price={p.price}
-              popularity={p.popularity}
-              stock={p.stock}
+              
             />
           ))}
         </div>

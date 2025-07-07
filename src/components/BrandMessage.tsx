@@ -1,5 +1,4 @@
 // src/components/BrandMessage.tsx
-import React from "react";
 
 export default function BrandMessage() {
   return (

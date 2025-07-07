@@ -21,7 +21,7 @@ const Register = () => {
 
     try {
       // Send registration request to backend
-      const response = await customFetch.post("/auth/register", {
+      await customFetch.post("/auth/register", {
         username,
         email: data.email,
         password: data.password,

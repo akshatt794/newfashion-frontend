@@ -1,5 +1,5 @@
 // src/components/FeaturedProductsCarousel.tsx
-import React from "react";
+
 
 const featured = [
   { name: "Velvet Anarkali", price: "₹29,000", image: "/images/featured1.jpg" },

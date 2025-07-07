@@ -1,5 +1,4 @@
 // src/components/AppTrust.tsx
-import React from "react";
 import { ShieldCheck, Award, Star } from "lucide-react";
 
 const trustItems = [

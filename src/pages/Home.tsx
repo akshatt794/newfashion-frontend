@@ -1,4 +1,3 @@
-import React from 'react';
 import VideoBanner from '../components/VideoBanner';
 import VideoCard from '../components/VideoCard';
 import clips from '../data/clips';

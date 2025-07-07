@@ -1,5 +1,4 @@
 // src/components/HeroBanner.tsx
-import React from "react";
 
 export default function HeroBanner() {
   return (

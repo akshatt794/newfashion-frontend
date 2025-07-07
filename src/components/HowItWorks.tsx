@@ -1,5 +1,4 @@
 // src/components/HowItWorks.tsx
-import React from "react";
 import { PackageSearch, ShoppingCart, Truck } from "lucide-react";
 
 const steps = [

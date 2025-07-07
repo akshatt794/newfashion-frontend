@@ -1,5 +1,5 @@
 // src/components/VideoBanner.tsx
-import React from 'react'
+
 
 const VideoBanner: React.FC = () => {
   return (

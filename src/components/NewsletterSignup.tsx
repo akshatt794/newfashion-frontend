@@ -1,5 +1,4 @@
 // src/components/NewsletterSignup.tsx
-import React from "react";
 
 export default function NewsletterSignup() {
   return (

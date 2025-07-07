@@ -1,5 +1,3 @@
-import React from 'react';
-
 type VideoCardProps = {
   title: string;
   src: string;

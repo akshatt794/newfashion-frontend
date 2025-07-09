@@ -1,12 +1,20 @@
+// backend/models/Banner.js
 const mongoose = require('mongoose');
 
-const BannerSchema = new mongoose.Schema({
-  image: { type: String },      // for image banners (optional)
-  video: { type: String },      // for video banners (optional)
-  poster: { type: String },     // for video poster (optional)
-  link: { type: String },
-  title: { type: String },      // use title instead of 'text' for overlay
-  subheadline: { type: String } // optional: for subtitle/extra overlay text
+const bannerSchema = new mongoose.Schema({
+  title: String,
+  link: String,
+  subheadline: String,
+  image: String,
+  video: String,
+  poster: String,
+  type: {
+    type: String,
+    enum: ["video", "carousel"],
+    required: true,
+    default: "carousel"
+  }
 });
 
-module.exports = mongoose.models.Banner || mongoose.model('Banner', BannerSchema);
+
+module.exports = mongoose.model('Banner', bannerSchema);

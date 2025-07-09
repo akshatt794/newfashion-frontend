@@ -1,6 +1,6 @@
 // src/pages/Home.tsx
 
-import BannerCarousel from "../components/BannerCarousel"; // NEW: Dynamic banner carousel
+import BannerCarousel from "../components/BannerCarousel";
 import VideoCard from "../components/VideoCard";
 import clips from "../data/clips";
 import ProductGrid from "../components/ProductGrid";

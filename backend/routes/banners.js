@@ -1,3 +1,4 @@
+// routes/banner.js
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
@@ -14,12 +15,16 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Upload banner (image or video)
+// POST /api/banners - Upload a banner (image or video, with type)
 router.post("/", upload.single("file"), async (req, res) => {
   try {
-    const { title, link, subheadline, poster } = req.body;
+    const { title, link, subheadline, poster, type } = req.body; // <-- type is required
+    if (!type || !["video", "carousel"].includes(type)) {
+      return res.status(400).json({ message: "Banner 'type' must be 'video' or 'carousel'" });
+    }
+
     const file = req.file;
-    let bannerData = { title, link, subheadline };
+    let bannerData = { title, link, subheadline, type };
 
     if (!file) {
       return res.status(400).json({ message: "No file uploaded" });
@@ -42,17 +47,22 @@ router.post("/", upload.single("file"), async (req, res) => {
   }
 });
 
-// Get all banners
+// GET /api/banners?type=carousel (or type=video) - Get banners by type or all
 router.get("/", async (req, res) => {
   try {
-    const banners = await Banner.find({});
+    const { type } = req.query;
+    let query = {};
+    if (type && ["video", "carousel"].includes(type)) {
+      query.type = type;
+    }
+    const banners = await Banner.find(query);
     res.json(banners);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Delete banner
+// DELETE /api/banners/:id - Delete a banner
 router.delete("/:id", async (req, res) => {
   try {
     await Banner.findByIdAndDelete(req.params.id);

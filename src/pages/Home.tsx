@@ -1,7 +1,7 @@
 // src/pages/Home.tsx
 import { useEffect, useState } from "react";
 
-import VideoBanner from "../components/VideoBanner";
+import HeroBanner from "../components/HeroBanner"; // <-- USE THIS
 import VideoCard from "../components/VideoCard";
 import clips from "../data/clips";
 import ProductGrid from "../components/ProductGrid";
@@ -14,7 +14,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch all products for home page
     customFetch
       .get("/products")
       .then((res) => setProducts(res.data))
@@ -24,8 +23,8 @@ export default function Home() {
 
   return (
     <div className="space-y-24">
-      {/* 1. Hero Video */}
-      <VideoBanner />
+      {/* 1. Hero Banner (Dynamic from Admin Panel) */}
+      <HeroBanner />
 
       {/* 2. Featured Clips */}
       <section className="py-16 px-5">

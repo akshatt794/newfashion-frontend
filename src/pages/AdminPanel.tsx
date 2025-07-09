@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+// src/pages/AdminPanel.tsx
+import React, { useEffect, useState, useRef } from "react";
 import customFetch from "../axios/custom";
 import ProductForm from "../components/ProductForm";
 
-// Types
 type Product = {
   _id: string;
   name: string;
@@ -17,7 +17,6 @@ type Banner = {
   video?: string;
   title?: string;
   link?: string;
-  type?: string; // "hero" or "carousel"
 };
 type Order = {
   _id: string;
@@ -63,7 +62,7 @@ const cardClass: React.CSSProperties = {
 };
 
 const AdminPanel: React.FC = () => {
-  // PRODUCTS
+  // ---- PRODUCTS ----
   const [products, setProducts] = useState<Product[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [message, setMessage] = useState("");
@@ -98,14 +97,11 @@ const AdminPanel: React.FC = () => {
     fetchProducts();
   };
 
-  // BANNERS
+  // ---- BANNERS ----
   const [banners, setBanners] = useState<Banner[]>([]);
-  // Two separate forms
-  const [heroForm, setHeroForm] = useState({ title: "", link: "" });
-  const [carouselForm, setCarouselForm] = useState({ title: "", link: "" });
+  const [bannerForm, setBannerForm] = useState({ title: "", link: "" });
   const [bannerMsg, setBannerMsg] = useState("");
-  const heroFileRef = useRef<HTMLInputElement>(null);
-  const carouselFileRef = useRef<HTMLInputElement>(null);
+  const bannerFileRef = useRef<HTMLInputElement>(null);
 
   const fetchBanners = async () => {
     try {
@@ -120,67 +116,36 @@ const AdminPanel: React.FC = () => {
     fetchBanners();
   }, []);
 
-  // Hero Banner (video)
-  const handleHeroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setHeroForm({ ...heroForm, [e.target.name]: e.target.value });
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBannerForm({ ...bannerForm, [e.target.name]: e.target.value });
   };
-  const handleHeroSubmit = async (e: React.FormEvent) => {
+
+  const handleBannerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBannerMsg("");
     const formData = new FormData();
-    if (heroFileRef.current?.files?.[0]) {
-      formData.append("file", heroFileRef.current.files[0]);
+    if (bannerFileRef.current?.files?.[0]) {
+      formData.append("file", bannerFileRef.current.files[0]);
     } else {
-      setBannerMsg("Please select a video file.");
+      setBannerMsg("Please select a banner image or video.");
       return;
     }
-    formData.append("title", heroForm.title);
-    formData.append("link", heroForm.link);
-    formData.append("type", "hero");
+    formData.append("title", bannerForm.title);
+    formData.append("link", bannerForm.link);
+
     try {
       await customFetch.post("/banners", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setBannerMsg("Hero Banner added!");
-      setHeroForm({ title: "", link: "" });
-      if (heroFileRef.current) heroFileRef.current.value = "";
+      setBannerMsg("Banner added!");
+      setBannerForm({ title: "", link: "" });
+      if (bannerFileRef.current) bannerFileRef.current.value = "";
       fetchBanners();
     } catch {
-      setBannerMsg("Error adding hero banner");
+      setBannerMsg("Error adding banner");
     }
   };
 
-  // Carousel Banners (images/videos)
-  const handleCarouselChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCarouselForm({ ...carouselForm, [e.target.name]: e.target.value });
-  };
-  const handleCarouselSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setBannerMsg("");
-    const formData = new FormData();
-    if (carouselFileRef.current?.files?.[0]) {
-      formData.append("file", carouselFileRef.current.files[0]);
-    } else {
-      setBannerMsg("Please select an image/video file.");
-      return;
-    }
-    formData.append("title", carouselForm.title);
-    formData.append("link", carouselForm.link);
-    formData.append("type", "carousel");
-    try {
-      await customFetch.post("/banners", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setBannerMsg("Carousel Banner added!");
-      setCarouselForm({ title: "", link: "" });
-      if (carouselFileRef.current) carouselFileRef.current.value = "";
-      fetchBanners();
-    } catch {
-      setBannerMsg("Error adding carousel banner");
-    }
-  };
-
-  // Delete Banner
   const handleDeleteBanner = async (id: string) => {
     if (!window.confirm("Delete this banner?")) return;
     try {
@@ -192,11 +157,7 @@ const AdminPanel: React.FC = () => {
     }
   };
 
-  // Separate hero and carousel banners
-  const heroBanner = banners.find((b) => b.type === "hero" && b.video);
-  const carouselBanners = banners.filter((b) => b.type === "carousel");
-
-  // ORDERS
+  // ---- ORDERS ----
   const [orders, setOrders] = useState<Order[]>([]);
   const [orderMsg, setOrderMsg] = useState("");
 
@@ -213,7 +174,7 @@ const AdminPanel: React.FC = () => {
     fetchOrders();
   }, []);
 
-  // USERS
+  // ---- USERS ----
   const [users, setUsers] = useState<User[]>([]);
   const [userMsg, setUserMsg] = useState("");
 
@@ -242,7 +203,12 @@ const AdminPanel: React.FC = () => {
           onSuccess={onProductFormSuccess}
         />
         {message && (
-          <div style={{ marginTop: 10, color: message.includes("Error") ? "red" : "green" }}>
+          <div
+            style={{
+              marginTop: 10,
+              color: message.includes("Error") ? "red" : "green",
+            }}
+          >
             {message}
           </div>
         )}
@@ -311,66 +277,23 @@ const AdminPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* HERO BANNER (VIDEO) */}
+      {/* BANNERS CARD */}
       <div style={cardClass}>
-        <h2>Hero Banner Video (top of home page)</h2>
-        <form
-          onSubmit={handleHeroSubmit}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 14,
-            marginBottom: 18,
-          }}
-        >
-          <div>
-            <label style={{ fontWeight: 500 }}>Banner Video</label>
-            <input
-              ref={heroFileRef}
-              type="file"
-              accept="video/*"
-              style={inputClass}
-              required
-            />
+        <h2>Manage Banners / Posters</h2>
+        {/* Banner Message */}
+        {bannerMsg && (
+          <div
+            style={{
+              margin: "8px 0",
+              color: bannerMsg.toLowerCase().includes("error") ? "red" : "#28a745",
+              fontWeight: 500,
+            }}
+          >
+            {bannerMsg}
           </div>
-          <div>
-            <label style={{ fontWeight: 500 }}>Banner Title (optional)</label>
-            <input
-              name="title"
-              placeholder="Banner Title (optional)"
-              value={heroForm.title}
-              onChange={handleHeroChange}
-              style={inputClass}
-            />
-          </div>
-          <div>
-            <label style={{ fontWeight: 500 }}>Link (optional)</label>
-            <input
-              name="link"
-              placeholder="Link (optional)"
-              value={heroForm.link}
-              onChange={handleHeroChange}
-              style={inputClass}
-            />
-          </div>
-          <button type="submit" style={{ ...buttonClass, gridColumn: "1 / 4" }}>
-            Add Hero Banner
-          </button>
-        </form>
-        {heroBanner && (
-          <video
-            src={`https://newfashion-backend.onrender.com${heroBanner.video}`}
-            controls
-            style={{ width: "100%", maxWidth: 600, margin: "auto" }}
-          />
         )}
-      </div>
-
-      {/* CAROUSEL BANNERS */}
-      <div style={cardClass}>
-        <h2>Banner Carousel (multiple images/videos below header)</h2>
         <form
-          onSubmit={handleCarouselSubmit}
+          onSubmit={handleBannerSubmit}
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr",
@@ -379,9 +302,9 @@ const AdminPanel: React.FC = () => {
           }}
         >
           <div>
-            <label style={{ fontWeight: 500 }}>Image/Video</label>
+            <label style={{ fontWeight: 500 }}>Banner Image/Video</label>
             <input
-              ref={carouselFileRef}
+              ref={bannerFileRef}
               type="file"
               accept="image/*,video/*"
               style={inputClass}
@@ -389,12 +312,14 @@ const AdminPanel: React.FC = () => {
             />
           </div>
           <div>
-            <label style={{ fontWeight: 500 }}>Banner Title (optional)</label>
+            <label style={{ fontWeight: 500 }}>
+              Banner Title (optional)
+            </label>
             <input
               name="title"
               placeholder="Banner Title (optional)"
-              value={carouselForm.title}
-              onChange={handleCarouselChange}
+              value={bannerForm.title}
+              onChange={handleBannerChange}
               style={inputClass}
             />
           </div>
@@ -403,46 +328,88 @@ const AdminPanel: React.FC = () => {
             <input
               name="link"
               placeholder="Link (optional)"
-              value={carouselForm.link}
-              onChange={handleCarouselChange}
+              value={bannerForm.link}
+              onChange={handleBannerChange}
               style={inputClass}
             />
           </div>
-          <button type="submit" style={{ ...buttonClass, gridColumn: "1 / 4" }}>
-            Add Carousel Banner
+          <button
+            type="submit"
+            style={{ ...buttonClass, gridColumn: "1 / 4" }}
+          >
+            Add Banner
           </button>
         </form>
-        {/* Show carousel banners */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 18 }}>
-          {carouselBanners.map((b) => (
-            <div key={b._id} style={{ width: 160 }}>
-              {b.image && (
-                <img
-                  src={`https://newfashion-backend.onrender.com${b.image}`}
-                  style={{ width: "100%", borderRadius: 6, marginBottom: 6 }}
-                  alt={b.title}
-                />
-              )}
-              {b.video && (
-                <video
-                  src={`https://newfashion-backend.onrender.com${b.video}`}
-                  controls
-                  style={{ width: "100%", borderRadius: 6, marginBottom: 6 }}
-                />
-              )}
-              <div style={{ fontSize: 13, color: "#666" }}>{b.title}</div>
-              <button
-                onClick={() => handleDeleteBanner(b._id)}
-                style={{ ...buttonClass, background: "#f44336", marginTop: 4 }}
-              >
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
+        <h4>All Banners/Posters</h4>
+        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              <th>Image/Video</th>
+              <th>Title</th>
+              <th>Link</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {banners.length ? (
+              banners.map((b) => (
+                <tr key={b._id} style={{ borderTop: "1px solid #eee" }}>
+                  <td>
+                    {b.image ? (
+                      <img
+                        src={`https://newfashion-backend.onrender.com${b.image}`}
+                        alt={b.title || ""}
+                        style={{
+                          width: 90,
+                          height: 36,
+                          objectFit: "cover",
+                          borderRadius: 4,
+                        }}
+                      />
+                    ) : b.video ? (
+                      <video
+                        src={`https://newfashion-backend.onrender.com${b.video}`}
+                        style={{
+                          width: 90,
+                          height: 36,
+                          objectFit: "cover",
+                          borderRadius: 4,
+                        }}
+                        controls
+                        muted
+                      />
+                    ) : null}
+                  </td>
+                  <td>{b.title}</td>
+                  <td>
+                    {b.link && (
+                      <a href={b.link} target="_blank" rel="noopener noreferrer">
+                        {b.link}
+                      </a>
+                    )}
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => handleDeleteBanner(b._id)}
+                      style={{ ...buttonClass, background: "#f44336" }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center", color: "#888" }}>
+                  No banners found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {/* ORDER SECTION */}
+      {/* ORDERS SECTION */}
       <div style={cardClass}>
         <h2>All Orders</h2>
         {orderMsg && <div style={{ color: "red" }}>{orderMsg}</div>}
@@ -486,7 +453,7 @@ const AdminPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* USERS CARD */}
+      {/* USERS SECTION */}
       <div style={cardClass}>
         <h2>All Registered Users</h2>
         {userMsg && <div style={{ color: "red" }}>{userMsg}</div>}

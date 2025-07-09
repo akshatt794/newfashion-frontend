@@ -1,5 +1,6 @@
 // src/pages/Home.tsx
-import VideoBanner from "../components/VideoBanner";
+
+import BannerCarousel from "../components/BannerCarousel"; // NEW: Dynamic banner carousel
 import VideoCard from "../components/VideoCard";
 import clips from "../data/clips";
 import ProductGrid from "../components/ProductGrid";
@@ -21,8 +22,8 @@ export default function Home() {
 
   return (
     <div className="space-y-24">
-      {/* 1. Hero Banner (Dynamic from Admin Panel) */}
-      <VideoBanner />
+      {/* 1. Dynamic Banner Carousel (admin banners show here) */}
+      <BannerCarousel />
 
       {/* 2. Featured Clips */}
       <section className="py-16 px-5">

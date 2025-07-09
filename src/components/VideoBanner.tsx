@@ -1,6 +1,6 @@
-// src/components/HomeBanner.tsx
+// src/components/VideoBanner.tsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import customFetch from "../axios/custom";
 
 type Banner = {
   _id: string;
@@ -10,50 +10,41 @@ type Banner = {
   link?: string;
 };
 
-export default function HomeBanner() {
+export default function VideoBanner() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("https://newfashion-backend.onrender.com/api/banners")
-      .then(res => {
-        setBanners(res.data);
-      })
+    customFetch
+      .get("/banners")
+      .then((res) => setBanners(res.data))
       .catch(() => setBanners([]))
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div style={{textAlign: "center"}}>Loading banners...</div>;
-  if (banners.length === 0) return <div style={{textAlign: "center"}}>No banners available.</div>;
+  if (loading) return <div>Loading banner...</div>;
+  if (!banners.length) return <div className="w-full text-center py-10 text-lg">No banners available.</div>;
 
+  // Show first banner (or loop, or use a carousel)
+  const banner = banners[0];
   return (
-    <section className="w-full mb-10">
-      {banners.map(banner => (
-        <div key={banner._id} className="mb-8 w-full rounded-xl overflow-hidden shadow relative">
-          {banner.video ? (
-            <video
-              src={`https://newfashion-backend.onrender.com${banner.video}`}
-              controls
-              autoPlay
-              loop
-              muted
-              className="w-full h-[400px] object-cover"
-            />
-          ) : banner.image ? (
-            <img
-              src={`https://newfashion-backend.onrender.com${banner.image}`}
-              alt={banner.title || "Shop Banner"}
-              className="w-full h-[400px] object-cover"
-            />
-          ) : null}
-          {banner.title && (
-            <div className="absolute bottom-5 left-5 text-white text-3xl font-bold shadow-lg">
-              {banner.title}
-            </div>
-          )}
-        </div>
-      ))}
+    <section className="w-full overflow-hidden rounded-xl mb-8">
+      {banner.video ? (
+        <video
+          src={`https://newfashion-backend.onrender.com${banner.video}`}
+          autoPlay
+          loop
+          muted
+          className="w-full h-[350px] object-cover"
+          poster={banner.image ? `https://newfashion-backend.onrender.com${banner.image}` : ""}
+        />
+      ) : banner.image ? (
+        <img
+          src={`https://newfashion-backend.onrender.com${banner.image}`}
+          alt={banner.title || "Banner"}
+          className="w-full h-[350px] object-cover"
+        />
+      ) : null}
     </section>
   );
 }

@@ -1,13 +1,11 @@
 // src/pages/Home.tsx
-import { useEffect, useState } from "react";
-
-import HeroBanner from "../components/HeroBanner"; // <-- USE THIS
+import VideoBanner from "../components/VideoBanner";
 import VideoCard from "../components/VideoCard";
 import clips from "../data/clips";
 import ProductGrid from "../components/ProductGrid";
 import customFetch from "../axios/custom";
-
-import { Product } from "../types/Product"; // Update path as needed
+import { useEffect, useState } from "react";
+import { Product } from "../types/Product";
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -24,7 +22,7 @@ export default function Home() {
   return (
     <div className="space-y-24">
       {/* 1. Hero Banner (Dynamic from Admin Panel) */}
-      <HeroBanner />
+      <VideoBanner />
 
       {/* 2. Featured Clips */}
       <section className="py-16 px-5">

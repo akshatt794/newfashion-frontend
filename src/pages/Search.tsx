@@ -31,7 +31,8 @@ const Search = () => {
       </Form>
 
       <ProductGridWrapper searchQuery={searchParams.get("query")!} page={currentPage}>
-        <ProductGrid />
+      <ProductGrid products={[]} />
+
       </ProductGridWrapper>
 
       <ShowingSearchPagination page={currentPage} setCurrentPage={setCurrentPage} />

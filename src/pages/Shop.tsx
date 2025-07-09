@@ -1,21 +1,11 @@
-import React from "react";
-import { Product } from "../types/Product";
+// src/pages/Shop.tsx
+import { useParams } from "react-router-dom";
+import ShopPageContent from "../components/ShopPageContent";
 
-const ProductGrid = ({ products }: { products: Product[] }) => (
-  <div>
-    {products.map((p) => (
-      <div key={p._id}>
-        <img
-          src={`https://newfashion-backend.onrender.com${p.image}`}
-          alt={p.name}
-          style={{ width: 150, height: 150, objectFit: "cover" }}
-        />
-        <div>{p.name}</div>
-        <div>₹{p.price}</div>
-        <div>{p.category}</div>
-      </div>
-    ))}
-  </div>
-);
+// Only care about the category param!
+const Shop = () => {
+  const { category } = useParams<{ category?: string }>();
+  return <ShopPageContent category={category} />;
+};
 
-export default React.memo(ProductGrid);
+export default Shop;

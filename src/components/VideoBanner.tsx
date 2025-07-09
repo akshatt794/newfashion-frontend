@@ -1,23 +1,35 @@
-// src/components/VideoBanner.tsx
+// src/components/HomeBanner.tsx
 
 
-const VideoBanner: React.FC = () => {
+export default function HomeBanner() {
   return (
-    <div className="relative w-full h-[80vh] overflow-hidden">
-      <video
-        src="/videos/hero.mp4"        // ← this path serves from public/videos/hero.mp4
-        autoPlay
-        muted
-        loop
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-      <div className="relative z-10 flex items-center justify-center h-full">
-        <h1 className="text-white text-5xl font-bold text-center drop-shadow-lg">
-        Born to Stand Out
-        </h1>
+    <section className="w-full mb-10">
+      {/* Static Video Banner */}
+      <div className="w-full h-[400px] mb-5 relative overflow-hidden rounded-xl shadow">
+        <video
+          className="object-cover w-full h-full"
+          autoPlay
+          loop
+          muted
+          poster="/banner-placeholder.jpg" // fallback image if video doesn't load
+        >
+          <source src="/sample-banner-video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        {/* Optional: Add overlay text */}
+        <div className="absolute bottom-5 left-5 text-white text-3xl font-bold shadow-lg">
+          Welcome to NewFashion!
+        </div>
       </div>
-    </div>
-  )
-}
 
-export default VideoBanner
+      {/* Static Image Banner */}
+      <div className="w-full h-[300px] rounded-xl overflow-hidden shadow">
+        <img
+          src="/banner-placeholder.jpg"
+          alt="Shop Banner"
+          className="object-cover w-full h-full"
+        />
+      </div>
+    </section>
+  );
+}

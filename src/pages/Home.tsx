@@ -1,18 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import VideoBanner from '../components/VideoBanner';
-import VideoCard from '../components/VideoCard';
-import clips from '../data/clips';
-import ProductGrid from '../components/ProductGrid';
-import customFetch from '../axios/custom';
+// src/pages/Home.tsx
+import { useEffect, useState } from "react";
+
+import VideoBanner from "../components/VideoBanner";
+import VideoCard from "../components/VideoCard";
+import clips from "../data/clips";
+import ProductGrid from "../components/ProductGrid";
+import customFetch from "../axios/custom";
+
+import { Product } from "../types/Product"; // Update path as needed
 
 export default function Home() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch products from backend API
-    customFetch.get('/products')
-      .then(res => setProducts(res.data))
-      .catch(err => console.error("Failed to fetch products", err));
+    // Fetch all products for home page
+    customFetch
+      .get("/products")
+      .then((res) => setProducts(res.data))
+      .catch(() => setProducts([]))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -24,7 +31,7 @@ export default function Home() {
       <section className="py-16 px-5">
         <h2 className="text-4xl text-center mb-8">Featured Clips</h2>
         <div className="flex flex-wrap justify-center gap-8">
-          {clips.map(c => (
+          {clips.map((c) => (
             <VideoCard
               key={c.title}
               title={c.title}
@@ -35,10 +42,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. Product Grid (NOW PASSED!) */}
+      {/* 3. Product Grid */}
       <section className="py-16 px-5 bg-gray-50">
         <h2 className="text-4xl text-center mb-8">Our Collection</h2>
-        <ProductGrid products={products} />
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <ProductGrid products={products} />
+        )}
       </section>
 
       {/* 4. Testimonials */}

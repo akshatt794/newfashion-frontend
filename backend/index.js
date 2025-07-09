@@ -16,11 +16,12 @@ const authRoutes      = require("./routes/auth");
 const adminProdRoutes = require("./routes/products");
 
 const app = express();
+const path = require("path");
 
 // ─── MIDDLEWARE ────────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static('uploads')); // Serves files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── MULTER CONFIG ─────────────────────────────────────────────────────────────
 const storage = multer.diskStorage({

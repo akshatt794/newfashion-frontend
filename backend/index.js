@@ -19,7 +19,14 @@ const app = express();
 const path = require("path");
 
 // ─── MIDDLEWARE ────────────────────────────────────────────────────────────────
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://newfashion-frontend.netlify.app",
+    "http://localhost:5173" // for local dev, keep if needed
+  ],
+  credentials: true // if you use cookies/auth
+}));
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
